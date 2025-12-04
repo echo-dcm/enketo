@@ -404,7 +404,7 @@ function _submitRecord(survey) {
                 level = 'warning';
             }
         })
-        .then(() => {
+        .then((record) => {
             // this event is used in communicating back to iframe parent window
             document.dispatchEvent(events.SubmissionSuccess());
 
@@ -446,13 +446,22 @@ function _submitRecord(survey) {
                     );
                 }, 1200);
             } else {
+                const hittinePostMessage = {
+                    status:'success',
+                    instanceID:record.instanceId
+                }
+                console.log(hittinePostMessage,'Log: Submission Success');
+                window?.ReactNativeWebView?.postMessage(JSON.stringify(hittinePostMessage));
+                // For web
+                window.parent.postMessage(JSON.stringify(hittinePostMessage),"*");
+
                 msg = msg.length > 0 ? msg : t('alert.submissionsuccess.msg');
                 gui.alert(
                     msg,
                     t('alert.submissionsuccess.heading'),
                     level
                 ).then(() => {
-                    _resetForm(survey);
+                    // _resetForm(survey);
                 });
             }
         })
@@ -596,9 +605,9 @@ function _saveRecord(survey, draft, recordName, confirmed) {
 
             return records.save(saveMethod, record);
         })
-        .then(() => {
+        .then((record) => {
             records.removeAutoSavedRecord();
-            _resetForm(survey, { isOffline: true });
+            // _resetForm(survey, { isOffline: true });
 
             if (draft) {
                 gui.alert(
@@ -609,6 +618,17 @@ function _saveRecord(survey, draft, recordName, confirmed) {
                 );
 
                 return true;
+            }
+
+            if(!draft){
+                const hittinePostMessage = {
+                    status:'pending',
+                    instanceID:record.instanceId
+                }
+                console.log(hittinePostMessage,'Log: Submitting Record as online');
+                window?.ReactNativeWebView?.postMessage(JSON.stringify(hittinePostMessage));
+                // For web
+                window.parent.postMessage(JSON.stringify(hittinePostMessage),'*');
             }
 
             return records.uploadQueue({ isUserTriggered: !draft });

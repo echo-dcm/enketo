@@ -115,7 +115,14 @@ function _uploadRecord(record) {
         )
         .then((results) => {
             console.log('results of all batches submitted', results);
-
+            const hittinePostMessage = {
+                    status:'success',
+                    instanceID:batches?.[0]?.instanceId
+                }
+            console.log(hittinePostMessage,'Log: Submitting saved record');
+            window?.ReactNativeWebView?.postMessage(JSON.stringify(hittinePostMessage));
+            // For web
+            window.parent.postMessage(JSON.stringify(hittinePostMessage),'*');
             result = results[0];
         })
         .then(() => result);

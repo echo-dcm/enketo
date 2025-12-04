@@ -1,0 +1,46 @@
+# .github/workflows/build-push.yml
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: echo15/enketo:latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Docker Buildx (for faster Docker builds)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Cache Docker layers (optional but speeds up rebuilds)
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
+      # Build Docker image
+      - name: Build Docker image
+        run: docker build --tag $IMAGE_TAG .
+
+      # Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASS }}
+
+      # Push Docker image
+      - name: Push Docker image
+        run: docker push $IMAGE_TAG

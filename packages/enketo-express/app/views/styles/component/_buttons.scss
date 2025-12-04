@@ -1,4 +1,4 @@
-$body-font-family: 'OpenSans' !default;
+$body-font-family: 'Z06-Walone' !default;
 $oil: #333333 !default;
 $secondary-color: white !default;
 $global-radius: 3px !default;
@@ -74,7 +74,7 @@ $button-disabled-cursor: $cursor-default-value !default;
         cursor: $cursor-pointer-value;
         font-family: $button-font-family;
         font-weight: $button-font-weight;
-        line-height: normal;
+        // line-height: normal;
         margin: 0 0 $button-margin-bottom;
         position: relative;
         text-decoration: none;
